@@ -11,21 +11,21 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 404 - waluta lub zakres dat nie znaleziony w NBP
     @ExceptionHandler(CurrencyNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(CurrencyNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(errorBody(ex.getMessage(), 404));
     }
 
-    // Inne błędy NBP (400, 503, itp.)
+
+
     @ExceptionHandler(NbpApiException.class)
     public ResponseEntity<Map<String, Object>> handleNbpError(NbpApiException ex) {
         return ResponseEntity.status(ex.getStatusCode())
                 .body(errorBody(ex.getMessage(), ex.getStatusCode()));
     }
 
-    // Złe parametry wejściowe
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleBadRequest(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -35,6 +35,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
 
+        return null;
     }
 
     @ExceptionHandler(Exception.class)
@@ -42,6 +43,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(errorBody("Wewnętrzny błąd serwera: " + ex.getMessage(), 500));
     }
+
+
 
     private Map<String, Object> errorBody(String message, int status) {
         return Map.of(
@@ -51,3 +54,5 @@ public class GlobalExceptionHandler {
         );
     }
 }
+
+

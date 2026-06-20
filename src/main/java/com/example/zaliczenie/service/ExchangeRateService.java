@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -19,8 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class ExchangeRateService {
 
+public class ExchangeRateService {
 
 
     private static final String NBP_URL =
@@ -44,7 +45,7 @@ public class ExchangeRateService {
         }
         NbpResponse nbpResponse = callNbpApi(currency.toUpperCase(), from, to);
 
-        // Obliczam tutaj średnią  średniej z wszystkich kursów w przedziale
+        // Obliczam sobie tutaj średnią na podstawie wszystkich kursów
         List<BigDecimal> rates = nbpResponse.getRates().stream()
                 .map(NbpResponse.Rate::getMid)
                 .toList();
@@ -53,7 +54,7 @@ public class ExchangeRateService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .divide(BigDecimal.valueOf(rates.size()), 4, RoundingMode.HALF_UP);
 
-        // Zapis do bazy
+
         ExchangeRateQuery query = new ExchangeRateQuery();
         query.setCurrency(currency.toUpperCase());
         query.setDateFrom(from);
@@ -63,7 +64,7 @@ public class ExchangeRateService {
 
         ExchangeRateQuery saved = repository.save(query);
 
-        // Zwrócenie odpowiedzi
+
         return new ExchangeRateResponse(
                 saved.getId(),
                 saved.getCurrency(),
@@ -73,6 +74,7 @@ public class ExchangeRateService {
                 saved.getRequestedAt()
         );
     }
+
 
     private NbpResponse callNbpApi(String currency, LocalDate from, LocalDate to) {
         try {
@@ -101,7 +103,12 @@ public class ExchangeRateService {
             throw new NbpApiException("Nie można połączyć się z API NBP: " + e.getMessage(), 503);
         }
     }
+
 }
+
+
+
+
 
 
 
