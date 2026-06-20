@@ -17,14 +17,11 @@ public class GlobalExceptionHandler {
                 .body(errorBody(ex.getMessage(), 404));
     }
 
-
-
     @ExceptionHandler(NbpApiException.class)
     public ResponseEntity<Map<String, Object>> handleNbpError(NbpApiException ex) {
         return ResponseEntity.status(ex.getStatusCode())
                 .body(errorBody(ex.getMessage(), ex.getStatusCode()));
     }
-
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleBadRequest(IllegalArgumentException ex) {
@@ -33,18 +30,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
-
-        return null;
-    }
-
-    @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneral(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(errorBody("Wewnętrzny błąd serwera: " + ex.getMessage(), 500));
     }
-
-
 
     private Map<String, Object> errorBody(String message, int status) {
         return Map.of(
@@ -54,5 +43,3 @@ public class GlobalExceptionHandler {
         );
     }
 }
-
-
